@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const app = express();
+app.disable("x-powered-by");
 
 // use to accept body as a json
 app.use(express.json());
@@ -15,6 +16,11 @@ app.use(
     credentials: true,
   }),
 );
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 /* Define all Routes here*/
 app.use("/api/auth", authRouter);
 app.use("/api/interview", interviewRouter);
