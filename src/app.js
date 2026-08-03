@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const authRouter = require("./routes/auth.routes");
 const { interviewRouter } = require("./routes/interview.routes");
@@ -24,5 +25,9 @@ app.get("/health", (req, res) => {
 /* Define all Routes here*/
 app.use("/api/auth", authRouter);
 app.use("/api/interview", interviewRouter);
+
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, "..", "public", "404.html"));
+});
 
 module.exports = app;
