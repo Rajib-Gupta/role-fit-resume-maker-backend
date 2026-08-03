@@ -20,7 +20,11 @@ app.use(
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
-
+app.use((req, res, next) => {
+  console.log("Original URL:", req.originalUrl);
+  console.log("Path:", req.path);
+  next();
+});
 /* Define all Routes here*/
 app.use("/api/auth", authRouter);
 app.use("/api/interview", interviewRouter);
