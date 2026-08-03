@@ -3,6 +3,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const tokenBlackList = require("../models/blacklist.model");
 
+const isProduction = process.env.NODE_ENV === "production";
+
+const authCookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  maxAge: 24 * 60 * 60 * 1000,
+};
+
 // Register a User in the server
 const signUp = async (req, res) => {
   const { username, email, password } = req.body;
@@ -38,13 +47,13 @@ const signUp = async (req, res) => {
         expiresIn: "1d",
       },
     );
-    res.cookie("token", token);
+    res.cookie("token", token, authCookieOptions);
 
     res.status(201).json({
       message: " User created successfully!",
       user: {
         id: user._id,
-        userbname: user.username,
+        username: user.username,
         email: user.email,
       },
     });
@@ -83,13 +92,13 @@ const login = async (req, res) => {
       },
     );
 
-    res.cookie("token", token);
+    res.cookie("token", token, authCookieOptions);
 
     res.status(200).json({
       message: "Login Successfull!",
       user: {
         id: user._id,
-        userbname: user.username,
+        username: user.username,
         email: user.email,
       },
     });
@@ -105,7 +114,11 @@ const logout = async (req, res) => {
     if (token) {
       await tokenBlackList.create({ token });
     }
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
     res.status(200).json({ message: "Logout successful!" });
   } catch (error) {
     console.log("error", error);
